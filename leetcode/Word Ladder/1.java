@@ -43,6 +43,7 @@ class Solution {
         List<Node> openList = new ArrayList<>();
         List<Node> nextList = new ArrayList<>();
         openList.add(start);
+        start.visited = true;
 
         int ret = 1;
         while (true) {
@@ -59,13 +60,13 @@ class Solution {
             if (curr.str.equals(endWord)) {
                 return ret;
             }
-            curr.visited = true;
             openList.remove(0);
 
             List<Node> neighbors = graph.get(curr.str);
             for (Node neighbor : neighbors) {
                 if (neighbor.visited) continue;
                 nextList.add(neighbor);
+                neighbor.visited = true;
             }
         }
     }
