@@ -3,13 +3,11 @@ class Solution {
         String str;
         boolean visited;
         List<Node> parent;
-        int dist;
 
         Node(String str) {
             this.str = str;
             this.visited = false;
             this.parent = new ArrayList<>();
-            this.dist = 1;
         }
     }
 
@@ -70,17 +68,6 @@ class Solution {
         return ret;
     }
 
-    Node getMin(List<Node> nodes) {
-        Node ret = nodes.get(0);
-        for (int i = 1; i < nodes.size(); i++) {
-            Node c = nodes.get(i);
-            if (c.dist < ret.dist) {
-                ret = c;
-            }
-        }
-        return ret;
-    }
-
     public List<List<String>> findLadders(String beginWord, String endWord, List<String> wordList) {
         HashMap<String, List<Node>> graph = new HashMap<>();
         HashMap<String, Node> nodes = new HashMap<>();
@@ -108,13 +95,14 @@ class Solution {
         }
 
         Node start = nodes.get(beginWord);
+        start.visited = true;
+
         HashMap<Node, Boolean> openMap = new HashMap<>();
         List<Node> openList = new ArrayList<>();
         List<Node> nextList = new ArrayList<>();
 
         openList.add(start);
         openMap.put(start, true);
-        start.visited = true;
 
         List<List<String>> ret = new ArrayList<>();
 
@@ -131,25 +119,19 @@ class Solution {
             }
 
             openList = removeDuplicateList(openList);
-
-            Node curr = getMin(openList);
+            Node curr = openList.get(0);
+            openList.remove(0);
             curr.visited = true;
 
             if (curr.str.equals(endWord)) {
-                List<List<String>> path = getPath(curr);
-                for (List<String> p : path) {
-                    ret.add(p);
-                }
+                ret.addAll(getPath(curr));
             }
-            openList.remove(curr);
 
             List<Node> neighbors = graph.get(curr.str);
             for (Node neighbor : neighbors) {
                 if (neighbor.visited) continue;
-                if (openList.indexOf(neighbor) != -1) continue;
                 if (openMap.containsKey(neighbor)) continue;
 
-                neighbor.dist = curr.dist + 1;
                 nextList.add(neighbor);
                 neighbor.parent.add(curr);
             }
