@@ -1,33 +1,32 @@
 class Solution {
     
-    int [][]memo;
-    
+    HashMap<String, Integer> memo;
+
     int solve(int x, int y, int m, int n) {
         if (x == n - 1 && y == m - 1) {
             return 1;
         }
-        
-        if(memo[x][y] != 0){
-            return memo[x][y];
-        }
 
-        boolean right = x + 1 < n;
-        boolean down = y + 1 < m;
+        String key = String.format("%d-%d", x, y);
+        Integer mem = memo.get(key);
+        if (mem != null) {
+            return mem;
+        }
 
         int ret = 0;
-        if (right) {
+        if (x + 1 < n) {
             ret += solve(x + 1, y, m, n);
         }
-        if (down) {
+        if (y + 1 < m) {
             ret += solve(x, y + 1, m, n);
         }
 
-        memo[x][y] = ret;
+        memo.put(key, ret);
         return ret;
     }
-    
+
     public int uniquePaths(int m, int n) {
-        memo = new int[100][100];
+        memo = new HashMap<String, Integer>();
         return solve(0, 0, m, n);
     }
 }
