@@ -39,7 +39,8 @@ class Solution {
             }
 
             if (currSum < target) left = mid + 1;
-            else right = mid - 1;
+            else if (currSum > target) right = mid - 1;
+            else break;
         }
 
         return bestValue;
