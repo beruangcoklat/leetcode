@@ -20,24 +20,23 @@ public class Solution {
 
                 if (source == destination) continue;
 
-                int max = Math.max(source, destination);
-                int min = Math.min(source, destination);
-
-                while (parent[min] != 0) {
-                    if(parent[parent[min]] != 0)
-                        parent[min] = parent[parent[min]];
-                    min = parent[min];
+                while (parent[source] != 0) {
+                    if(parent[parent[source]] != 0)
+                        parent[source] = parent[parent[source]];
+                    source = parent[source];
                 }
 
-                while (parent[max] != 0) {
-                    max = parent[max];
+                while (parent[destination] != 0) {
+                    if(parent[parent[destination]] != 0)
+                        parent[destination] = parent[parent[destination]];
+                    destination = parent[destination];
                 }
 
-                if (min == max) continue;
+                if (source == destination) continue;
 
-                parent[min] = max;
-                count[parent[min]] += count[min];
-                count[min] = 0;
+                parent[source] = destination;
+                count[parent[source]] += count[source];
+                count[source] = 0;
             } else {
                 int node = scanner.nextInt();
                 while (parent[node] != 0) {
