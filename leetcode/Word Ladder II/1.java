@@ -3,22 +3,22 @@ class Solution {
         String str;
         boolean visited;
         List<Node> parent;
+        int cost;
 
         Node(String str) {
             this.str = str;
             this.visited = false;
             this.parent = new ArrayList<>();
+            this.cost = 1;
         }
     }
 
     boolean connectable(String a, String b) {
         int diff = 0;
-
         for (int i = 0; i < a.length(); i++) {
             if (a.charAt(i) != b.charAt(i)) diff++;
             if (diff > 1) break;
         }
-
         return diff == 1;
     }
 
@@ -26,17 +26,6 @@ class Solution {
         List<String> ret = new ArrayList<>();
         for (String n : nodes) {
             ret.add(n);
-        }
-        return ret;
-    }
-
-    List<Node> removeDuplicateList(List<Node> nodes) {
-        HashMap<Node, Boolean> map = new HashMap<>();
-        List<Node> ret = new ArrayList<>();
-        for (Node n : nodes) {
-            if (map.containsKey(n)) continue;
-            ret.add(n);
-            map.put(n, true);
         }
         return ret;
     }
@@ -99,46 +88,51 @@ class Solution {
 
         HashMap<Node, Boolean> openMap = new HashMap<>();
         List<Node> openList = new ArrayList<>();
-        List<Node> nextList = new ArrayList<>();
 
         openList.add(start);
         openMap.put(start, true);
 
         List<List<String>> ret = new ArrayList<>();
 
-        while (true) {
-            if (openList.isEmpty()) {
-                if (!ret.isEmpty()) break;
-                if (nextList.isEmpty()) break;
+        while (ret.isEmpty() && !openList.isEmpty()) {
+            int currSize = openList.size();
+            for (int aaa = 0; aaa < currSize; aaa++) {
+                Node curr = openList.get(0);
+                openList.remove(0);
+                openMap.remove(curr);
+                curr.visited = true;
 
-                openList = nextList;
-                nextList = new ArrayList<>();
+                if (curr.str.equals(endWord)) {
+                    List<List<String>> paths = getPath(curr);
+                    for (List<String> path : paths) {
+                        ret.add(reverseList(path));
+                    }
+                    continue;
+                }
 
-                openMap.clear();
-                for (Node a : openList) openMap.put(a, true);
-            }
+                List<Node> neighbors = graph.get(curr.str);
+                for (Node neighbor : neighbors) {
+                    if (neighbor.visited) continue;
+                    if (openMap.containsKey(neighbor)) {
+                        if (neighbor.parent.size() > 0) {
+                            Node par = neighbor.parent.get(0);
+                            if (par.cost >= curr.cost) {
+                                neighbor.parent.add(curr);
+                            }
+                        } else {
+                            neighbor.parent.add(curr);
+                        }
+                        continue;
+                    }
 
-            openList = removeDuplicateList(openList);
-            Node curr = openList.get(0);
-            openList.remove(0);
-            curr.visited = true;
-
-            if (curr.str.equals(endWord)) {
-                ret.addAll(getPath(curr));
-            }
-
-            List<Node> neighbors = graph.get(curr.str);
-            for (Node neighbor : neighbors) {
-                if (neighbor.visited) continue;
-                if (openMap.containsKey(neighbor)) continue;
-
-                nextList.add(neighbor);
-                neighbor.parent.add(curr);
+                    openList.add(neighbor);
+                    openMap.put(neighbor, true);
+                    neighbor.parent.add(curr);
+                    neighbor.cost += curr.cost;
+                }
             }
         }
 
-        List<List<String>> reverseRet = new ArrayList<>();
-        for (List<String> a : ret) reverseRet.add(reverseList(a));
-        return reverseRet;
+        return ret;
     }
 }
