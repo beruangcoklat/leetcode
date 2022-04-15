@@ -1,0 +1,50 @@
+/**
+ * Definition for a binary tree node.
+ * type TreeNode struct {
+ *     Val int
+ *     Left *TreeNode
+ *     Right *TreeNode
+ * }
+ */
+func findReplacer(root *TreeNode, low, high int) *TreeNode {
+	for root != nil && (root.Val > high || root.Val < low) {
+		if root.Val > high {
+			root = root.Left
+		} else {
+			root = root.Right
+		}
+	}
+	return root
+}
+
+func trimBST(root *TreeNode, low int, high int) *TreeNode {
+	if root == nil {
+		return nil
+	}
+
+	if root.Val > high || root.Val < low {
+		root = findReplacer(root, low, high)
+	}
+
+	queue := []*TreeNode{root}
+
+	for len(queue) > 0 {
+		curr := queue[0]
+		queue = queue[1:]
+		if curr == nil {
+			continue
+		}
+
+		if curr.Right != nil && curr.Right.Val > high {
+			curr.Right = findReplacer(curr.Right, low, high)
+		}
+
+		if curr.Left != nil && curr.Left.Val < low {
+			curr.Left = findReplacer(curr.Left, low, high)
+		}
+
+		queue = append(queue, curr.Right, curr.Left)
+	}
+
+	return root
+}
