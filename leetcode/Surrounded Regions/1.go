@@ -7,10 +7,6 @@ type point struct {
 	x, y int
 }
 
-func inBorder(x, y int, board [][]byte) bool {
-	return x == 0 || y == 0 || x == len(board[0])-1 || y == len(board)-1
-}
-
 func bfs(x, y int, board [][]byte, visited [][]bool) []point {
 	ret := []point{}
 	list := []point{{x, y}}
@@ -37,40 +33,6 @@ func bfs(x, y int, board [][]byte, visited [][]bool) []point {
 	return ret
 }
 
-func canUpdate(points []point, board [][]byte) bool {
-	mark := make(map[string]struct{})
-	for _, point := range points {
-		key := fmt.Sprintf("%d-%d", point.x, point.y)
-		mark[key] = struct{}{}
-
-		if board[point.y][point.x] == 'O' && inBorder(point.x, point.y, board) {
-			return false
-		}
-	}
-
-	for _, point := range points {
-		for i := 0; i < len(dirX); i++ {
-			nx := point.x + dirX[i]
-			ny := point.y + dirY[i]
-
-			if nx < 0 || ny < 0 || nx >= len(board[0]) || ny >= len(board) {
-				continue
-			}
-
-			key := fmt.Sprintf("%d-%d", nx, ny)
-			if _, ok := mark[key]; ok {
-				continue
-			}
-
-			if board[ny][nx] == 'O' {
-				return false
-			}
-		}
-	}
-
-	return true
-}
-
 func solve(board [][]byte) {
 	visited := make([][]bool, len(board))
 	for i := 0; i < len(board); i++ {
@@ -83,7 +45,15 @@ func solve(board [][]byte) {
 				continue
 			}
 			points := bfs(x, y, board, visited)
-			if !canUpdate(points, board) {
+
+			canUpdate := true
+			for _, point := range points {
+				if point.x == 0 || point.y == 0 || point.x == len(board[0])-1 || point.y == len(board)-1 {
+					canUpdate = false
+					break
+				}
+			}
+			if !canUpdate {
 				continue
 			}
 
